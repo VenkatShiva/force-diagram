@@ -27,8 +27,12 @@ function App() {
         <pointLight position={[10, 10, 10]} />
         <OrbitControls
           target={[0, 0, 0]}
-          minPolarAngle={Math.PI / 2.5}
-          maxPolarAngle={Math.PI / 2.1}
+          minPolarAngle={0}
+          maxPolarAngle={Math.PI}
+          enableZoom={true}
+          enablePan={true}
+          maxDistance={20}
+          minDistance={2}
         />
 
         {/* Origin Marker (Small Dot) */}
