@@ -8,22 +8,18 @@ function ForcePoint({ x, y, z, Fx = 0, Fy = 0, Fz = 0, name = "" }) {
   const normalizedVec = forceVec.clone().normalize();
   const arrowLength = magnitude * 0.5;
 
-  // Arrow end point position for placing label
-  const labelPosition = normalizedVec.clone().multiplyScalar(arrowLength * 0.9); // Slightly before arrow tip
+  const labelPosition = normalizedVec.clone().multiplyScalar(arrowLength * 0.9);
 
-  // Angle with respect to X-axis in XY plane
   const angleRadians = Math.atan2(Fy, Fx);
   const angleDegrees = THREE.MathUtils.radToDeg(angleRadians).toFixed(1);
 
   return (
     <group position={[x, y, z]}>
-      {/* Point marker */}
       <mesh>
         <sphereGeometry args={[0.1, 12, 12]} />
         <meshStandardMaterial color="red" />
       </mesh>
 
-      {/* Point name */}
       <Text
         position={[0, 0.25, 0]}
         fontSize={0.2}
@@ -34,7 +30,6 @@ function ForcePoint({ x, y, z, Fx = 0, Fy = 0, Fz = 0, name = "" }) {
         {name}
       </Text>
 
-      {/* Axis arrows */}
       <arrowHelper
         args={[
           new THREE.Vector3(1, 0, 0),
@@ -70,8 +65,6 @@ function ForcePoint({ x, y, z, Fx = 0, Fy = 0, Fz = 0, name = "" }) {
       <Text position={[0, 0, 0.6]} fontSize={0.15} color="blue">
         Z
       </Text>
-
-      {/* Resultant arrow and label */}
       {magnitude > 0 && (
         <>
           <arrowHelper
