@@ -3,7 +3,24 @@ import * as THREE from "three";
 import { Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber"; // ✅ Correct import
 
-function ForcePoint({ x, y, z, Fx = 0, Fy = 0, Fz = 0, name = "" }) {
+function ForcePoint({
+  x: oldX,
+  y: oldY,
+  z: oldZ,
+  Fx: oldFx = 0,
+  Fy: oldFy = 0,
+  Fz: oldFz = 0,
+  name = "",
+}) {
+  const x = -oldY;
+  const y = oldZ;
+  const z = -oldX;
+  const isBack = name?.includes("`");
+  // const Fx = -oldFx;
+  let Fx = -oldFy;
+  const Fy = oldFz;
+  const Fz = -oldFx;
+  // console.log("-->", x, y, z);
   const currentVec = useRef(new THREE.Vector3(Fx, Fy, Fz));
   const targetVec = useRef(new THREE.Vector3(Fx, Fy, Fz));
 
@@ -51,14 +68,16 @@ function ForcePoint({ x, y, z, Fx = 0, Fy = 0, Fz = 0, name = "" }) {
       </Text>
 
       {/* Coordinate axes */}
+
       <arrowHelper
         args={[
-          new THREE.Vector3(1, 0, 0),
+          new THREE.Vector3(-1, 0, 0),
           new THREE.Vector3(0, 0, 0),
           0.5,
           0xff0000,
         ]}
       />
+
       <arrowHelper
         args={[
           new THREE.Vector3(0, 1, 0),
@@ -67,25 +86,50 @@ function ForcePoint({ x, y, z, Fx = 0, Fy = 0, Fz = 0, name = "" }) {
           0x00ff00,
         ]}
       />
-      <arrowHelper
+      {isBack ? (
+        <arrowHelper
+          args={[
+            new THREE.Vector3(0, 0, 1),
+            new THREE.Vector3(0, 0, 0),
+            0.5,
+            0x0000ff,
+          ]}
+        />
+      ) : (
+        <arrowHelper
+          args={[
+            new THREE.Vector3(0, 0, -1),
+            new THREE.Vector3(0, 0, 0),
+            0.5,
+            0x0000ff,
+          ]}
+        />
+      )}
+      {/* <arrowHelper
         args={[
-          new THREE.Vector3(0, 0, 1),
+          new THREE.Vector3(0, 0, -1),
           new THREE.Vector3(0, 0, 0),
           0.5,
           0x0000ff,
         ]}
-      />
+      /> */}
 
       {/* Axis labels */}
-      <Text position={[0.6, 0, 0]} fontSize={0.15} color="red">
-        X
+      <Text position={[-0.6, 0, 0]} fontSize={0.15} color="red">
+        Y ({oldFy})
       </Text>
       <Text position={[0, 0.6, 0]} fontSize={0.15} color="green">
-        Y
+        Z ({oldFz})
       </Text>
-      <Text position={[0, 0, 0.6]} fontSize={0.15} color="blue">
-        Z
-      </Text>
+      {isBack ? (
+        <Text position={[0, 0, 0.6]} fontSize={0.15} color="blue">
+          X ({oldFx})
+        </Text>
+      ) : (
+        <Text position={[0, 0, -0.6]} fontSize={0.15} color="blue">
+          X ({oldFx})
+        </Text>
+      )}
 
       {magnitude > 0 && (
         <>
