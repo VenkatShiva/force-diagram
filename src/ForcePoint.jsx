@@ -1,16 +1,36 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { Text } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber"; // ✅ Correct import
 
 function ForcePoint({ x, y, z, Fx = 0, Fy = 0, Fz = 0, name = "" }) {
-  const forceVec = new THREE.Vector3(Fx, Fy, Fz);
-  const magnitude = forceVec.length();
-  const normalizedVec = forceVec.clone().normalize();
+  const currentVec = useRef(new THREE.Vector3(Fx, Fy, Fz));
+  const targetVec = useRef(new THREE.Vector3(Fx, Fy, Fz));
+
+  const [magnitude, setMagnitude] = useState(currentVec.current.length());
+  const [normalizedVec, setNormalizedVec] = useState(
+    currentVec.current.clone().normalize()
+  );
+
+  // Update target vector when props change
+  useEffect(() => {
+    targetVec.current.set(Fx, Fy, Fz);
+  }, [Fx, Fy, Fz]);
+
+  // Animate the vector smoothly on each frame
+  useFrame(() => {
+    currentVec.current.lerp(targetVec.current, 0.2); // interpolation speed
+    const mag = currentVec.current.length();
+    const norm =
+      mag > 0 ? currentVec.current.clone().normalize() : new THREE.Vector3();
+
+    setMagnitude(mag);
+    setNormalizedVec(norm);
+  });
+
   const arrowLength = magnitude * 0.1;
-
   const labelPosition = normalizedVec.clone().multiplyScalar(arrowLength * 0.9);
-
-  const angleRadians = Math.atan2(Fy, Fx);
+  const angleRadians = Math.atan2(currentVec.current.y, currentVec.current.x);
   const angleDegrees = THREE.MathUtils.radToDeg(angleRadians).toFixed(1);
 
   return (
@@ -30,6 +50,7 @@ function ForcePoint({ x, y, z, Fx = 0, Fy = 0, Fz = 0, name = "" }) {
         {name}
       </Text>
 
+      {/* Coordinate axes */}
       <arrowHelper
         args={[
           new THREE.Vector3(1, 0, 0),
@@ -65,6 +86,7 @@ function ForcePoint({ x, y, z, Fx = 0, Fy = 0, Fz = 0, name = "" }) {
       <Text position={[0, 0, 0.6]} fontSize={0.15} color="blue">
         Z
       </Text>
+
       {magnitude > 0 && (
         <>
           <arrowHelper
