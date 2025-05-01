@@ -6,7 +6,7 @@ function ForcePoint({ x, y, z, Fx = 0, Fy = 0, Fz = 0, name = "" }) {
   const forceVec = new THREE.Vector3(Fx, Fy, Fz);
   const magnitude = forceVec.length();
   const normalizedVec = forceVec.clone().normalize();
-  const arrowLength = magnitude * 0.5;
+  const arrowLength = magnitude * 0.1;
 
   const labelPosition = normalizedVec.clone().multiplyScalar(arrowLength * 0.9);
 

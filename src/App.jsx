@@ -1,51 +1,57 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Line, OrbitControls } from "@react-three/drei";
 import ForcePoint from "./ForcePoint";
 import "./App.css";
-
-const FORCE_POINTS = [
-  { name: "A", x: -2, y: 2.4, z: 0, Fx: 1, Fy: 2, Fz: 0 },
-  { name: "B", x: 0, y: 2.4, z: 0, Fx: 0, Fy: 1, Fz: 0 },
-  { name: "C", x: 2, y: 2.4, z: 0, Fx: 2, Fy: 0, Fz: 0 },
-  { name: "D", x: -2, y: -2.4, z: 0, Fx: 2, Fy: 0, Fz: 0 },
-  { name: "E", x: 0, y: -2.4, z: 0, Fx: 2, Fy: 0, Fz: 0 },
-  { name: "F", x: 2, y: -2.4, z: 0, Fx: 2, Fy: 0, Fz: 0 },
-  { name: "A`", x: -2, y: 2.4, z: -5, Fx: 1, Fy: 2, Fz: 0 },
-  { name: "B`", x: 0, y: 2.4, z: -5, Fx: 0, Fy: 1, Fz: 0 },
-  { name: "C`", x: 2, y: 2.4, z: -5, Fx: 2, Fy: 0, Fz: 0 },
-  { name: "D`", x: -2, y: -2.4, z: -5, Fx: 2, Fy: 0, Fz: 0 },
-  { name: "E`", x: 0, y: -2.4, z: -5, Fx: 2, Fy: 0, Fz: 0 },
-  { name: "F`", x: 2, y: -2.4, z: -5, Fx: 2, Fy: 0, Fz: 0 },
-];
+import useForce from "./store/store";
 
 function App() {
-  const [forcePoints, setForcePoints] = useState(FORCE_POINTS);
+  const [index, setIndex] = useState(0);
+  const controlsRef = useRef();
+  const { data } = useForce();
+  const currentSet = data[index];
+  const forcePoints = currentSet?.points || [];
+  const goNext = () => {
+    setIndex((prev) => (prev + 1) % data.length);
+  };
+  const goPrev = () => {
+    setIndex((prev) => {
+      if (prev > 1) return prev - 1;
+      return data.length - 1;
+    });
+  };
   return (
-    <div className="tv-frame">
-      <Canvas camera={{ position: [0, 0, 10], fov: 50 }}>
-        <ambientLight />
-        <pointLight position={[10, 10, 10]} />
-        <OrbitControls
-          target={[0, 0, 0]}
-          minPolarAngle={0}
-          maxPolarAngle={Math.PI}
-          enableZoom={true}
-          enablePan={true}
-          maxDistance={20}
-          minDistance={2}
-        />
+    <>
+      <div className="header">
+        <button onClick={goPrev}>Previous</button>
+        <p>{currentSet.name}</p>
+        <button onClick={goNext}>Next</button>
+      </div>
+      <div className="tv-frame">
+        <Canvas camera={{ position: [0, 0, 10], fov: 60 }}>
+          <ambientLight />
+          <pointLight position={[10, 10, 10]} />
+          <OrbitControls
+            ref={controlsRef}
+            target={[0, 0, 0]}
+            minPolarAngle={0}
+            maxPolarAngle={Math.PI}
+            enableZoom={true}
+            enablePan={true}
+            maxDistance={20}
+            minDistance={2}
+          />
 
-        <mesh position={[0, 0, 0]}>
-          <sphereGeometry args={[0.05, 8, 8]} />
-          <meshStandardMaterial color="black" />
-        </mesh>
+          <mesh position={[0, 0, 0]}>
+            <sphereGeometry args={[0.05, 8, 8]} />
+            <meshStandardMaterial color="black" />
+          </mesh>
 
-        {forcePoints.map((point, idx) => (
-          <ForcePoint key={idx} {...point} />
-        ))}
+          {forcePoints.map((point, idx) => (
+            <ForcePoint key={idx} {...point} />
+          ))}
 
-        {/* <Line
+          {/* <Line
           points={[
             [-2, 2.4, 0],
             [-2, -2.4, 0],
@@ -53,8 +59,15 @@ function App() {
           color="purple"
           lineWidth={2}
         /> */}
-      </Canvas>
-    </div>
+        </Canvas>
+        <button
+          className="reset-btn"
+          onClick={() => controlsRef.current?.reset()}
+        >
+          Reset
+        </button>
+      </div>
+    </>
   );
 }
 
