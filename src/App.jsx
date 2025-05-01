@@ -8,7 +8,7 @@ import useForce from "./store/store";
 function App() {
   const [index, setIndex] = useState(0);
   const controlsRef = useRef();
-  const { data } = useForce();
+  const { data, changeForce } = useForce();
   const currentSet = data[index];
   const forcePoints = currentSet?.points || [];
   const goNext = () => {
@@ -16,7 +16,7 @@ function App() {
   };
   const goPrev = () => {
     setIndex((prev) => {
-      if (prev > 1) return prev - 1;
+      if (prev > 0) return prev - 1;
       return data.length - 1;
     });
   };
@@ -67,6 +67,36 @@ function App() {
           Reset
         </button>
       </div>
+      <h2 className="force-inputs">Force Points</h2>
+      {forcePoints.map((point, ind) => (
+        <div key={`${index}-${ind}`}>
+          Name: {point.name} <br />
+          Fx :
+          <input
+            onChange={(e) => changeForce(index, ind, "Fx", e.target.value)}
+            name="Fx"
+            placeholder="Enter"
+            type="number"
+            value={point.Fx}
+          />
+          Fy :
+          <input
+            onChange={(e) => changeForce(index, ind, "Fy", e.target.value)}
+            name="Fy"
+            placeholder="Enter"
+            type="number"
+            value={point.Fy}
+          />
+          Fz :
+          <input
+            onChange={(e) => changeForce(index, ind, "Fz", e.target.value)}
+            name="Fz"
+            placeholder="Enter"
+            type="number"
+            value={point.Fz}
+          />
+        </div>
+      ))}
     </>
   );
 }
